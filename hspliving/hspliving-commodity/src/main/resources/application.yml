@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://192.168.56.100:3306/hspliving_commodity?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+  cloud:
+    alicloud:
+      oss:
+        endpoint: oss-cn-beijing.aliyuncs.com
+      #下面这里需要到阿里云oss重新获取  access-key secret-key
+      access-key: xxxxxxxxxxxxxxvxxx5L
+      secret-key: xxx7Jxxxx
+
+    #配置nacos
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848 #配置nacos的地址，IP + 端口 port
+  application:
+    name: hspliving-commodity
+
+  #1. 关闭了 thymeleaf的缓存,这样当前端页面变化时,就可以看到效果
+  #2. 在实际的生产环境,需要将cache 设置为true, 开启缓存,提高效率
+  thymeleaf:
+    cache: false
+
+#配置mybatis-plus
+mybatis-plus:
+  # 指定要扫描的 XxxMapper.xml 文件的位置
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto #配置主键自增。 这意味着，除非在实体类的 @TableId 注解中明确指定了不同的 type 值，否则，系统默认会将主键的生成策略设置为自增（AUTO），即主键的值将由数据库在新记录插入时自动生成。
+      logic-delete-value: 0 # 逻辑已删除值(默认为 1,老韩这里配置成自己的)
+      logic-not-delete-value: 1 # 逻辑未删除值(默认为 0,老韩这里配置成自己的)
+  configuration:
+    # 配置标准日志输出 这里我们配置输出底层sql，方便观察sql
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hspedu.hspliving.commodity.dao.AttrAttrgroupRelationDao">
+
+	<!-- 定义了如何将数据库结果集映射到Java对象的规则 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hspedu.hspliving.commodity.entity.AttrAttrgroupRelationEntity" id="attrAttrgroupRelationMap">
+        <result property="id" column="id"/>
+        <result property="attrId" column="attr_id"/>
+        <result property="attrGroupId" column="attr_group_id"/>
+        <result property="attrSort" column="attr_sort"/>
+    </resultMap>
+    <!--
+        实现deleteBatchRelation方法
+        1. collection="entities" 中的"entities" 在deleteBatchRelation()方法中
+           使用注解@Param("entities") 进行指定的,表示的就是传入的该
+           AttrAttrgroupRelationEntity对象的List集合
+        2. separator="OR"
+        3. #{item.attrId} 中的 attrId 不能乱写，指的就是item对象的属性名！
+        item对象 就是一个 AttrAttrgroupRelationEntity对象
+     -->
+    <!--
+        实现 deleteBatchRelation 方法
+        1. "collection='entities'" 对应 deleteBatchRelation() 方法中通过 @Param("entities") 注解指定的 List 类型的参数。
+           这里的 "entities" 必须与 @Param 注解中的名称一致。
+        2. "separator='OR'" separator 在 foreach 循环的上下文中通常用于连接 SQL 语句的各个部分。
+        3. "#{item.attrId}" 和 "#{item.attrGroupId}" 的使用正确。它们分别引用了遍历的当前元素（即 AttrAttrgroupRelationEntity 对象）的 'attrId' 和 'attrGroupId' 属性。
+           确保这些属性名与 AttrAttrgroupRelationEntity 类中的属性名一致。
+
+       最终生成的语句为:
+       DELETE FROM `commodity_attr_attrgroup_relation` WHERE (`attr_id`=? AND `attr_group_id` = ?)
+       或者
+       DELETE FROM `commodity_attr_attrgroup_relation` WHERE (`attr_id`=? AND `attr_group_id` = ?) OR (`attr_id`=? AND `attr_group_id` = ?)
+    -->
+    <delete id="deleteBatchRelation">
+        DELETE FROM `commodity_attr_attrgroup_relation` WHERE
+        <foreach collection="entities" item="item" separator="OR">
+            (`attr_id`=#{item.attrId} AND `attr_group_id` = #{item.attrGroupId})
+        </foreach>
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <!--导入springboot 父工程-规定写法-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.8.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+
+        <!--
+        ### <relativePath/>作用
+        - **默认行为**：如果不指定`relativePath`，Maven默认会查找子项目目录的`../pom.xml`作为父POM。这是因为默认的`relativePath`值是`../pom.xml`，假设父项目和子项目在文件系统中是相邻的目录结构。
+        - **自定义位置**：通过显式设置`relativePath`，你可以指定一个不同的位置来查找父POM。这在父项目不位于默认位置时非常有用。
+        - **避免查找**：如果设置`<relativePath/>`（即空的`relativePath`元素），Maven将不会在文件系统中查找父POM。这在父POM仅通过Maven仓库可用时很有帮助，而不是通过文件系统的相对路径。
+        -->
+    </parent>
+
+    <groupId>com.hspedu.hspliving</groupId>
+    <artifactId>hspliving-commodity</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>hspliving-commodity</name>
+    <description>顺平(家居生活)-商品模块</description>
+
+    <!--在这里可以用来指定mysql、mybatis.spring.boot.version...的版本
+    ，不使用版本仲裁-->
+    <properties>
+        <java.version>1.8</java.version>
+        <spring-cloud.version>2020.0.5</spring-cloud.version>
+    </properties>
+
+    <!--引入相关的依赖-->
+    <dependencies>
+
+        <!--引入thymeleaf的模板引擎,使用版本仲裁-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+
+        <!--引入公共模块-->
+        <dependency>
+            <groupId>com.hspedu.hspliving</groupId>
+            <artifactId>hspliving-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+        <!--导入web项目场景启动器: 会自动导入和web开发相关的所有依赖[库/jar]
+                     后面老师还会说spring-boot-starter-web 到底引入哪些相关依赖
+                     web项目场景启动器,这里是真正的引入了依赖
+                     starter-web 版本不需要指定 在父工程已经指定好了
+                     -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--引入test starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <!--只在test模块生效-->
+            <scope>test</scope>
+        </dependency>
+
+
+        <!--引入 aliyun-sdk-oss 对象存储服务 依赖 (原生SDK 对应的实现接口为 TestController /test)-->
+        <!--<dependency>-->
+        <!--    <groupId>com.aliyun.oss</groupId>-->
+        <!--    <artifactId>aliyun-sdk-oss</artifactId>-->
+        <!--    <version>3.5.0</version>-->
+        <!--</dependency>-->
+
+        <!--引入oss starter 这里引入的stater和文档给的不一样，
+        请注意观察artifactId，小伙伴要和老师写的保待一致-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+            <version>2.1.0.RELEASE</version>
+        </dependency>
+
+
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

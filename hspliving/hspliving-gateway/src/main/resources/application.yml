@@ -1,0 +1,123 @@
+server:
+  port: 5050 #gateway监听端口
+
+
+spring:
+  cloud:
+    #配置网关
+    gateway:
+      routes: #配置路由，可以有多个路由
+        - id: hspliving_service_route # 路由id, 由程序员指定，保证唯一
+          #当前配置完成的需求
+          #说明: 因为 api/service/ 是一个更加精确的路径，也必须将这组路由放在 /api 前面
+          #否则会报错！！
+          #1. routes: #配置路由, 可以有多个路由配置
+          #2. 注意因为/api/service/** 是一个更精确的路径，必须放在/api/** 这一组路由前面
+          #3. 否则会报告 {"msg":"invalid token","code":401}
+
+          # 打到网关来的url地址是: http://localhost:5050/api/service/oss/policy
+          #如果到网关的请求是 http://localhost:5050/api/service/??/??/?? , gateway通过断言
+          #最终将请求路由转发到 http://hspliving-service[注册到nacos的hspliving-service服务ip+端口]/commodity/??/??/?? => url=uri+Path
+          #因为我们要去掉断言到的 Path的 /api/service ,所以这里会用到路径重写  segment:段;部分;片;
+
+          uri: lb://hspliving-service #http://localhost:7070
+          predicates:
+            - Path=/api/service/**
+          filters:
+            #下面是官方文档的示例写法, 注意这里`<segment>`之所以是`segment`
+            #,是因为`segment`代表片段的意思，也可以用其他单词占位 如:RewritePath=/red(?<hsp>/?.*), $\{hsp}
+            #但是重写前后需要对应，否则不可以如:`RewritePath=/red(?<hsp>/?.*), $\{abc}`就不行！！
+            #- RewritePath=/red(?<segment>/?.*), $\{segment}
+            #也就是路径重写后，最终的url是: http://localhost:7070/oss/policy
+            - RewritePath=/api/service/(?<segment>.*), /$\{segment}
+
+
+        - id: hspliving_commodity_route # 路由id, 由程序员指定，保证唯一
+          #当前配置完成的需求
+          #说明: 因为 api/commodity/ 是一个更加精确的路径，必须将这组路由放在 /api 前面
+          #否则会报错！！
+          #1. routes: #配置路由, 可以有多个路由配置
+          #2. 注意因为/api/commodity/** 是一个更精确的路径，必须放在/api/** 这一组路由前面
+          #3. 否则会报告 {"msg":"invalid token","code":401}
+
+          # 在前端项目中需要商品分类相关的请求要走后端项目hspliving-commodity的请求地址为:
+          # http://localhost:9090/commodity/category/list/tree
+          #如果到网关的请求是 http://localhost:5050/api/commodity/??/??/?? , gateway通过断言
+          #最终将请求路由转发到 http://hspliving-commodity[注册到nacos的hspliving-commodity服务ip+端口]/commodity/??/??/?? => url=uri+Path
+          #因为我们要去掉断言到的 Path的 /api ,所以这里会用到路径重写  segment:段;部分;片;
+
+          # 分析属性分组的请求
+          # http://localhost:5050/api/commodity/attrgroup/list
+          # 最终网关将请求转发到 http://localhost:9090/commodity/attrgroup/list
+
+          uri: lb://hspliving-commodity #http://localhost:9090
+          predicates:
+            - Path=/api/commodity/**
+          filters:
+            #下面是官方文档的示例写法, 注意这里`<segment>`之所以是`segment`
+            #,是因为`segment`代表片段的意思，也可以用其他单词占位 如:RewritePath=/red(?<hsp>/?.*), $\{hsp}
+            #但是重写前后需要对应，否则不可以如:`RewritePath=/red(?<hsp>/?.*), $\{abc}`就不行！！
+            #- RewritePath=/red(?<segment>/?.*), $\{segment}
+            - RewritePath=/api/(?<segment>.*), /$\{segment}
+
+        - id: hspliving_renren_fast_route # 路由id, 由程序员指定，保证唯一
+          #当前配置完成的需求
+          #如果到网关的请求是 http://localhost:5050/api/??/??/?? , gateway通过断言
+          #最终将请求路由转发到 http://renren-fast[注册到nacos的renren-fast服务ip+端口]/renren-fast/??/??/?? => url=uri+Path
+          # 需要前端页面系统相关的请求要走后端项目renren-fast的请求地址为:
+          # http://localhost:8080/renren-fast/sys/role/delete
+          #因为我们要去掉断言到的 Path的 /api ,所以这里会用到路径重写  segment:段;部分;片;
+          # 之所以改为使用`/api`进行是否走后端项目renren-fast的断言
+          # , 而不是直接使用`/renren-fast`直接进行断言，请求转发到renren-fast后端项目
+          # , 是因为 假如有个一在前端项目renren-fast的请求，不是要走后端项目renren-fast
+          # , 但是请求url中又带了`renren-fast`,换成`/api`相对减少了冲突
+          # 路径重新官方文档位置 https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.1.RELEASE/reference/html/#the-rewritepath-gatewayfilter-factory 的 5.17. The RewritePath GatewayFilter Factory
+
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            #下面是官方文档的示例写法, 注意这里`<segment>`之所以是`segment`
+            #,是因为`segment`代表片段的意思，也可以用其他单词占位 如:RewritePath=/red(?<hsp>/?.*), $\{hsp}
+            #但是重写前后需要对应，否则不可以如:`RewritePath=/red(?<hsp>/?.*), $\{abc}`就不行！！
+            #- RewritePath=/red(?<segment>/?.*), $\{segment}
+            - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}
+
+
+    #        - id: test_route01 # 路由id, 由程序员指定，保证唯一
+    #          #当前配置完成的需求
+    #          #如果到网关的请求是 http://localhost:5050/commodity/brand/list , gateway通过断言
+    #          #最终将请求路由转发到 http://localhost:9090/commodity/brand/list => url=uri+Path
+    #          uri: http://localhost:9090
+    #          predicates:
+    #            - Path=/commodity/brand/list
+    #        - id: test_route02 # 路由id, 由程序员指定，保证唯一
+    #          #当前配置完成的需求
+    #          #如果到网关的请求是 http://localhost:5050/anime , gateway通过断言
+    #          #最终将请求路由转发到 http://www.bilibili.com/anime => url=uri+Path
+    #          #或最终将请求路由转发到 https://www.bilibili.com/anime => url=uri+Path
+    #          uri: https://www.bilibili.com
+    #          predicates:
+    #            - Path=/anime
+
+        # for nginx 配置的一组路由
+        - id: hspliving_host_route
+          uri: lb://hspliving-commodity #http://localhost:9090
+          predicates:
+            #根据 nginx携带的Host信息 进行断言,这里需要注意优先级,放在最后最合适,如果放在最前面,会出问题!!!
+            #即如果该组路由放在最前面 浏览器输入的: www.hspliving.com/api/commodity/brand/list
+            #会优先匹配 `Host=**.hspliving22.com` 这个断言规则
+            #，然后在请求转发到 lb://hspliving-commodity/api/commodity/brand/list
+            #但是在`lb://hspliving-commodity` 的微服务中,没有配置类似 @RequestMapping("/api/commodity/brand/list") 的映射
+            #所以会返回404,找不到！！
+            - Host=**.hspliving22.com
+
+
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848 #配置nacos地址
+  application:
+    name: hspliving-gateway
+
+
+
