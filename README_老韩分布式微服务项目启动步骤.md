@@ -1,5 +1,25 @@
 
 
+# 0 注意当前项目的配置是基于Nginx动态代理
+
+使用了Nginx的动静分离，为老韩项目的最终版本，如果要配置Nginx则需要
+
+**把后端项目的所有静态资源文件**,
+
+**`D:\hspedu_hspliving_lx100\hspliving\hspliving-commodity\src\main\resources\static\` 目 录下 所 有 静 态 资 源 文 件** **,** **上 传 到** **Nginx** **下 的** **static** **目 录** **,** **然 后 删 除**
+
+**`D:\hspedu_hspliving_lx100\hspliving\hspliving-commodity\src\main\resources\static\`** 下 所有文件
+
+反之【即如果不使用Nginx动静分离】则需要修改项目中的多处路由地址，由指向Nginx下的`static\`目录，变更为指向本地的`hspliving-commodity\src\main\resources\static\`
+
+
+
+---
+
+【自用说明】- 配置Nginx更加方便，即删除本地`static\`目录下的所有文件即可，并将所有静态资源文件，全部由Nginx动静分离代理`static\`的静态资源
+
+**如果需要更加详细的项目步骤，请参考老韩的pdf笔记**
+
 # 1 无界面启动VirtualBox虚拟机
 
 ![image-20240522091145532](https://raw.githubusercontent.com/EXsYang/PicGo-images-hosting/main/images/image-20240522091145532.png)
